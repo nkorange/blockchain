@@ -1,9 +1,18 @@
 package main
 
-import "github.com/nkorange/blockchain/pkg"
+import (
+	"github.com/nkorange/blockchain/pkg"
+	"log"
+)
 
 func main() {
 	chain := pkg.NewBlockChain(5)
-	blk := pkg.NewBlock([]byte("data1"), chain.LastBlock().Hash())
-	blk.MineBlock(chain.Difficulty())
+	chain.AddTransaction(pkg.NewTransaction("addr1", "addr2", 100))
+	chain.AddTransaction(pkg.NewTransaction("addr2", "addr1", 50))
+
+	chain.MineBlock("addr3")
+	log.Println(chain.GetBalance("addr3"))
+
+	chain.MineBlock("addr3")
+	log.Println(chain.GetBalance("addr3"))
 }

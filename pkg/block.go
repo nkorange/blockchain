@@ -3,6 +3,7 @@ package pkg
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"log"
 	"strconv"
 	"strings"
@@ -10,14 +11,14 @@ import (
 )
 
 type Block struct {
-	transactions []byte
+	transactions []*Transaction
 	timestamp    int64
 	hash         string
 	preHash      string
 	nonce        int
 }
 
-func NewBlock(transactions []byte, preHash string) *Block {
+func NewBlock(transactions []*Transaction, preHash string) *Block {
 	blk := &Block{
 		transactions: transactions,
 		timestamp:    time.Now().UnixNano(),
@@ -41,7 +42,9 @@ func (blk *Block) MineBlock(difficulty int) {
 
 func (blk *Block) calculateHash() {
 	h := sha256.New()
-	h.Write(append(blk.transactions, []byte(blk.preHash)...))
+	data, _ := json.Marshal(blk.transactions)
+	h.Write(data)
+	h.Write([]byte(blk.preHash))
 	h.Write([]byte(strconv.Itoa(blk.nonce)))
 	sum := h.Sum(nil)
 	blk.hash = hex.EncodeToString(sum)
